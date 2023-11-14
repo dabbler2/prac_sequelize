@@ -1,19 +1,32 @@
-const {A,B} = require('./models/')
+const {Team,Player} = require('./models/')
 
-let f = async (name) => {
-	await A.create({name})
+let makeTeam = async (teamName) => await Team.create({teamName})
+let makePlayer = async (playerName,teamID) => await Player.create({playerName,teamID})
+
+let allPlayers = async () => { 
+	const table = await Player.findAll({})
+	console.log(table.map(x => x.dataValues))
 }
 
-let g = async (name) => {
-	await B.create({name})
+let join = async () => { 
+	const table = await Player.findAll({include: Team})
+	console.log(table.map(x => x.dataValues))
 }
 
-// model에 aID 없음
-// g(4,5) -> 당연히 씹힘
+let join2 = async () => { 
+	const table = await Team.findAll({include: Player})
+	console.log(table.map(x => x.dataValues))
+}
 
-// model에 aID 있음
-// g(6,7) -> a에 id가 7인 행이 없어서 에러
-// g(6,1) -> ㅇㅋ
-
-// model에 이상한 열 있음
-// g(11) -> 이상한 열 그냥 무시함
+(async () => {
+	await makeTeam('Twins') // id: 1
+	await makeTeam('Wiz') // id: 2
+	await makePlayer('Oh',1)
+	await makePlayer('Park',1)
+	await makePlayer('Bae',2)
+	await makePlayer('Hwang',2)
+	await makePlayer('Choi',3)
+    await allPlayers()
+	await join()
+	await join2()
+})()
